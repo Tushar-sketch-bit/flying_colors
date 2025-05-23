@@ -5,6 +5,56 @@ void main() {
   runApp(const MyApp());
 }
 
+class HoverIconButton extends StatefulWidget {
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback onPressed;
+
+  const HoverIconButton({
+    super.key,
+    required this.icon,
+    required this.tooltip,
+    required this.onPressed,
+  });
+
+  @override
+  State<HoverIconButton> createState() => _HoverIconButtonState();
+}
+
+class _HoverIconButtonState extends State<HoverIconButton> {
+  bool isHovered = false;
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: widget.tooltip,
+      child: MouseRegion(
+        onEnter: (_) => setState(() => isHovered = true),
+        onExit: (_) => setState(() => isHovered = false),
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 6.0),
+          decoration: BoxDecoration(
+            color: isHovered ? Colors.orange[500] : Colors.transparent,
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          child: IconButton(
+            icon: Icon(
+              widget.icon,
+              color: isHovered ? Colors.orange.shade100 : Colors.white70,
+            ),
+            onPressed: widget.onPressed,
+            iconSize: isHovered ? 30 : 27,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+//class MenuButton extends StatefulWidget {
+//final IconData icon;
+//final Tooltip tooltip;
+//final
+//}
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -12,7 +62,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'MKC UI',
+      title: 'UI SCREEN MAIN',
       theme: ThemeData.dark(),
       // theme: ThemeData(),
       home: MyHomePage(),
@@ -22,10 +72,11 @@ class MyApp extends StatelessWidget {
 
 class MyHomePage extends StatelessWidget {
   const MyHomePage({super.key});
-  void openLink() async {
-    final Uri url = Uri.parse("https://github.com/Tushar-sketch-bit");
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url);
+  Future<void> openLink(String url) async {
+    final Uri uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+      throw 'could not launch $url';
     }
   }
 
@@ -38,19 +89,30 @@ class MyHomePage extends StatelessWidget {
         leading: Icon(Icons.menu),
         title: Text("top bar", style: TextStyle(color: Colors.amber)),
         actions: [
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              IconButton(icon: Icon(Icons.code), onPressed: openLink),
-              IconButton(icon: Icon(Icons.login), onPressed: () {}),
-            ],
+          HoverIconButton(
+            icon: Icons.code,
+            tooltip: 'GitHub',
+            onPressed: () => openLink("https://github.com/Tushar-sketch-bit"),
+          ),
+          HoverIconButton(
+            icon: Icons.person,
+            tooltip: 'Linkdin',
+            onPressed:
+                () => openLink(
+                  "https://www.linkedin.com/in/tushar-malik-0b331b346/",
+                ),
+          ),
+          HoverIconButton(
+            icon: Icons.camera_alt,
+            tooltip: 'Instagram',
+            onPressed:
+                () => openLink("https://www.instagram.com/tushar_malik_99"),
           ),
         ],
       ),
       body: Center(
         child: Text(
-          "mkc Ui screen",
+          "UI SCREEN MAIN",
           style: TextStyle(fontSize: 24, fontFamily: 'arial'),
         ),
       ),
@@ -61,7 +123,7 @@ class MyHomePage extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            navItem(Icons.brightness_high, "brightness 0", true),
+            navItem(Icons.brightness_high, "brightness 0", false),
             navItem(Icons.brightness_high, "brightness 1", false),
             SizedBox(width: 50),
             navItem(Icons.brightness_high, "brightness 2", false),
